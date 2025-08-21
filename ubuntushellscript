@@ -1,15 +1,41 @@
 #!/bin/bash
-#Use t2.micro. If you use t3.micro then the network interface should be ens5 in the playbook.
-sudo apt update
-sudo apt install software-properties-common -y
+
+# Update the package repository
+sudo apt update -y
+
+# Install necessary utilities
+sudo apt install -y software-properties-common
+
+# Add the Ansible PPA repository
 sudo apt-add-repository --yes --update ppa:ansible/ansible
-sudo apt update
-sudo apt install ansible -y
-sudo apt install nginx -y
-sudo apt install python3-apt -y
-sudo apt install stress -y 
-sudo apt install git -y  
+
+# Install Ansible and other required packages
+sudo apt install -y ansible nginx python3-apt git stress
+
+# Fix broken dependencies if there are any
+sudo apt --fix-broken install -y
+
+# Check if /myrepo exists, and remove it if so
+if [ -d "/myrepo" ]; then
+  echo "/myrepo already exists. Removing it..."
+  sudo rm -rf /myrepo
+fi
+
+# Clone the repository
 sudo git clone https://github.com/sachinkumar04/autoscaling_testing-with-ansible.git /myrepo
+
+# Wait for a moment to ensure everything is in place
+sleep 10
+
+# Run the Ansible playbook (ensure it runs on localhost to avoid 'empty hosts list' warning)
+sudo ansible-playbook -i localhost, /myrepo/playbook.yaml
+
+# Final cleanup
+sudo apt autoremove -y
+sudo apt clean
+
+echo "Setup completed successfully!"
+
 
 ######GIVE ONLY ABOVE IN THE USER DATA FOR AMI IMAGE FOR AWS AUTOSCALING##########
 #
